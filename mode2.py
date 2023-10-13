@@ -19,7 +19,8 @@ class Mode2Navigator:
         """
         Student-TODO: Best/Worst Case
         """
-        self.sea_island = islands
+        self.sea_island += islands
+        print(self.sea_island)
 
 
     def simulate_day(self, crew: int) -> List[Tuple[Island, int]]:
