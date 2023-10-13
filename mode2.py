@@ -20,7 +20,6 @@ class Mode2Navigator:
         Student-TODO: Best/Worst Case
         """
         self.sea_island += islands
-        print(self.sea_island)
 
 
     def simulate_day(self, crew: int) -> List[Tuple[Island, int]]:
@@ -49,9 +48,5 @@ class Mode2Navigator:
                 best_island.money -= min((min_crew*best_island.money/best_island.marines),best_island.money)
                 best_island.marines -= min_crew
                 left_crew -= min_crew
-                print(max_score)
-                print(best_island.name)
-                print(min_crew)
-                print(best_island.money)
             return_list.append((best_island, min_crew))
         return return_list
