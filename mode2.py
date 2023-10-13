@@ -30,8 +30,8 @@ class Mode2Navigator:
             total_money = 0
             left_crew = crew
             max_score = 0
-            max_island = None
-            max_crew = 0
+            best_island = None
+            min_crew = 0
             for island in self.sea_island:
                 if island.money == 0:
                     continue
@@ -42,11 +42,15 @@ class Mode2Navigator:
                     score = (2*(left_crew-i))+moneyCollected
                     if score > max_score:
                         max_score = score
-                        max_island = island
-                        max_crew = i
-            if max_island is not None:
-                max_island.money -= min((max_crew*max_island.money/max_island.marines),max_island.money)
-                max_island.marines -= max_crew
-                left_crew -= max_crew
-            return_list.append((max_island, max_crew))
+                        best_island = island
+                        min_crew = i
+            if best_island is not None:
+                best_island.money -= min((min_crew*best_island.money/best_island.marines),best_island.money)
+                best_island.marines -= min_crew
+                left_crew -= min_crew
+                print(max_score)
+                print(best_island.name)
+                print(min_crew)
+                print(best_island.money)
+            return_list.append((best_island, min_crew))
         return return_list
