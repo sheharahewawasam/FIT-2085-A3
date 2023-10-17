@@ -52,17 +52,17 @@ class Mode1Navigator:
         temp_stack = ArrayStack(len(self.islands))
 
         while not self.island_stack.is_empty():
-            #Pop high priprity island from stack
             island = self.island_stack.pop()
             #stroe the island to temporary stack. 
             #After teh loop we can reinsert the island object to original stack
             temp_stack.push(island)
 
             crewToSend = min(island.marines, crew)
-            crew -= crewToSend
-            #If run out the crew stop iteration
-            if crew <= 0:
+            if crew < crewToSend:
+                returnElem = (island, crew)
+                selected_islands.append(returnElem)
                 break
+            crew -= crewToSend
 
             returnElem = (island, crewToSend)
             selected_islands.append(returnElem)
@@ -91,10 +91,9 @@ class Mode1Navigator:
 
                 crewToSend = min(island.marines, crew)
                 crew -= crewToSend
-                
-                #Clculate how much money Pirate's earn
+
                 current_money += min(island.money * crewToSend / island.marines, island.money)
-            #reset stack
+        
             while not temp_stack.is_empty():
                 self.island_stack.push(temp_stack.pop())
 
