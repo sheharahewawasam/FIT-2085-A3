@@ -4,100 +4,129 @@ from data_structures.heap import MaxHeap
 from data_structures.referential_array import ArrayR
 from arrayStack import ArrayStack
 
-
 class Mode1Navigator:
     """
-    Student-TODO: short paragraph as per https://edstem.org/au/courses/12108/lessons/42810/slides/294117
+    Mode1Navigator is a class that represents a navigator responsible for selecting islands
+    for exploration based on a specific strategy. The strategy involves prioritizing islands
+    with the highest ratio of marines to money and allocating available crew members to these
+    islands accordingly.
+
+    Attributes:
+        total_crew (int): The total number of crew members available for exploration.
+        sea_islands (list[Island]): A list of Island objects representing the available islands.
+        ratios (list[float]): A list of island ratios (marines to money) for prioritization.
+        islandDictionary (dict[float, Island]): A dictionary mapping ratios to islands.
+        islandStack (ArrayStack): A stack for managing islands based on their priority.
+
     """
 
     def __init__(self, islands: list[Island], crew: int) -> None:
         """
-        Student-TODO: Best/Worst Case
+        Initializes a Mode1Navigator with a list of islands and a crew size.
+
+        Args:
+            islands (list[Island]): A list of Island objects to explore.
+            crew (int): The total number of crew members available.
+
         """
         self.total_crew = crew
-        self.islands = islands
-        self.ratio_lst = []
-        self.island_dic = {}
-        self.island_stack = ArrayStack(len(islands))
+        self.sea_islands = islands
+        self.ratios = []
+        self.islandDictionary = {}
+        self.islandStack = ArrayStack(len(islands))
 
         for island in islands:
-            # Low priority island get high ratio
+            # Low priority island gets high ratio
             ratio_money_marine = island.marines / island.money
-            self.ratio_lst.append(ratio_money_marine)
-            # Add island to dict with key ratio
-            self.island_dic[ratio_money_marine] = island
+            self.ratios.append(ratio_money_marine)
+            # Add island to the dictionary with key ratio
+            self.islandDictionary[ratio_money_marine] = island
 
-        self.heap_islands = MaxHeap.heapify(self.ratio_lst)
+        self.islandsHeap = MaxHeap.heapify(self.ratios)
 
-        # Add island to stack from low priority order
-        while self.heap_islands.length > 0:
+        # Add islands to the stack in a low-priority order
+        while self.islandsHeap.length > 0:
             # Find the island by ratio
-            max_ratio = self.heap_islands.get_max()
-            island = self.island_dic[max_ratio]
-            self.island_stack.push(island)
+            maxRatio = self.islandsHeap.get_max()
+            island = self.islandDictionary[maxRatio]
+            self.islandStack.push(island)
 
     def select_islands(self) -> list[tuple[Island, int]]:
         """
-        Student-TODO: Best/Worst Case
-        Use heap with linked dictonary.
-        the heap sort the ratio of marine and money. From the max ratio find the island from dicsionary
+        Select and allocate crew to islands based on their ratio of marines to money.
+
+        Returns:
+            list[tuple[Island, int]]: A list of tuples representing the selected islands
+            and the allocated crew for each.
+
         """
-
         crew = self.total_crew
-        # idx = 0
-        selected_islands = []
-        temp_stack = ArrayStack(len(self.islands))
+        islandsSelected = []
+        tempStack = ArrayStack(len(self.sea_islands))
 
-        while not self.island_stack.is_empty():
-            island = self.island_stack.pop()
-            # stroe the island to temporary stack.
-            # After teh loop we can reinsert the island object to original stack
-            temp_stack.push(island)
+        while not self.islandStack.is_empty():
+            island = self.islandStack.pop()
+            # Store the island in a temporary stack.
+            # After the loop, we can reinsert the island object into the original stack.
+            tempStack.push(island)
 
             crewToSend = min(island.marines, crew)
             if crew < crewToSend:
                 returnElem = (island, crew)
-                selected_islands.append(returnElem)
+                islandsSelected.append(returnElem)
                 break
             crew -= crewToSend
 
             returnElem = (island, crewToSend)
-            selected_islands.append(returnElem)
+            islandsSelected.append(returnElem)
 
-        while not temp_stack.is_empty():
-            self.island_stack.push(temp_stack.pop())
+        while not tempStack.is_empty():
+            self.islandStack.push(tempStack.pop())
 
-        return selected_islands
+        return islandsSelected
 
     def select_islands_from_crew_numbers(self, crew_numbers: list[int]) -> list[float]:
         """
-        Student-TODO: Best/Worst Case
+        Select and allocate crew to islands based on a list of crew numbers.
+
+        Args:
+            crew_numbers (list[int]): A list of crew sizes to allocate to islands.
+
+        Returns:
+            list[float]: A list of the total money earned for each allocation.
+
         """
-        money_lst = []
-        temp_stack = ArrayStack(len(self.islands))
+        moneyList = []
+        tempStack = ArrayStack(len(self.sea_islands))
 
         for crew in crew_numbers:
-            temp_stack.clear()
+            tempStack.clear()
             current_money = 0
-            while not self.island_stack.is_empty():
-                island = self.island_stack.pop()
-                temp_stack.push(island)
+            while not self.islandStack.is_empty():
+                island = self.islandStack.pop()
+                tempStack.push(island)
 
                 crewToSend = min(island.marines, crew)
                 crew -= crewToSend
 
                 current_money += min(island.money * crewToSend / island.marines, island.money)
 
-            while not temp_stack.is_empty():
-                self.island_stack.push(temp_stack.pop())
+            while not tempStack.is_empty():
+                self.islandStack.push(tempStack.pop())
 
-            money_lst.append(current_money)
+            moneyList.append(current_money)
 
-        return money_lst
+        return moneyList
 
     def update_island(self, island: Island, new_money: float, new_marines: int) -> None:
         """
-        Student-TODO: Best/Worst Case
+        Update the information for a specific island.
+
+        Args:
+            island (Island): The Island object to be updated.
+            new_money (float): The new amount of money available on the island.
+            new_marines (int): The new number of marines stationed on the island.
+
         """
         island.marines = new_marines
         island.money = new_money
